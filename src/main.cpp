@@ -7,7 +7,7 @@ const char startMarker = '^'; //start byte of ADV packets
 // const int startMarker = 165; //start byte of ADV packets
 const char VVDChar = 'a'; //VVD packet designator
 const int VVDLength = 3; //length of VVD packets
-const int VSDLength = 4; //length of VSD packets
+const int VSDLength = 6; //length of VSD packets
 //const int VVDChar = 16; //VVD packet designator
 //const int VVDLength = 24; //length of VVD packets
 //const int VSDLength = 28; //length of VSD packets
@@ -17,16 +17,16 @@ boolean newData = false;
 void recvADV() {
   static byte ndx = 0;
   static boolean recvInProgress = false;
+  static int packetLength = 0;
   char rc;
-  int packetLength = 0;
   while (Serial.available() > 0 && newData == false) {
     rc = Serial.read();
     if (recvInProgress == true) {
       if (ndx == 1) {
-        if (rc == VVDChar) {
-          packetLength = VVDLength;
-        } else {
+        if (rc != VVDChar) {
           packetLength = VSDLength;
+        } else {
+          packetLength = VVDLength;
         }
         recievedChars[ndx] = rc;
         ndx++;
