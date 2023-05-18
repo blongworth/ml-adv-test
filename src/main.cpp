@@ -6,57 +6,70 @@ const byte numChars = 28; //max bytes for ADV packets
 const char startMarker = '^'; //start byte of ADV packets
 // const int startMarker = 165; //start byte of ADV packets
 const char VVDChar = 'a'; //VVD packet designator
-const int VVDLength = 3; //length of VVD packets
-const int VSDLength = 6; //length of VSD packets
+const byte VVDLength = 3; //length of VVD packets
+const byte VSDLength = 6; //length of VSD packets
 //const int VVDChar = 16; //VVD packet designator
 //const int VVDLength = 24; //length of VVD packets
 //const int VSDLength = 28; //length of VSD packets
-char recievedChars[numChars];
+char ADVpacket[numChars];
 boolean newData = false;
 
 void recvADV() {
   static byte ndx = 0;
   static boolean recvInProgress = false;
-  static int packetLength = 0;
+  static byte packetLength;
   char rc;
   while (Serial.available() > 0 && newData == false) {
     rc = Serial.read();
     if (recvInProgress == true) {
       if (ndx == 1) {
-        if (rc != VVDChar) {
-          packetLength = VSDLength;
-        } else {
+        if (rc == VVDChar) {
           packetLength = VVDLength;
+        } else {
+          packetLength = VSDLength;
         }
-        recievedChars[ndx] = rc;
+        ADVpacket[ndx] = rc;
         ndx++;
-      } else if (ndx == packetLength) { // whole packet received
-        //recievedChars[ndx] = '\0';
+      } else if (ndx == packetLength - 1) { // whole packet received
+        ADVpacket[ndx] = rc;
+        ndx++;
+        ADVpacket[ndx] = '\0';
         ndx = 0;
         newData = true;
         recvInProgress = false;
       } else {
-        recievedChars[ndx] = rc;
+        ADVpacket[ndx] = rc;
         ndx++;
-        if (ndx >= numChars) {
-          ndx = numChars - 1;
-        }
       }
     } else if (rc == startMarker) {
-      recievedChars[ndx] = rc;
+      ADVpacket[ndx] = rc;
       ndx++;
       recvInProgress = true;
     }
   }
 }
 
-void showNewData() {
+void parseVVD() {
+  Serial.print("New VVD: ");
+  Serial.println(ADVpacket);
+}
+
+void parseVSD() {
+  Serial.print("New VSD: ");
+  Serial.println(ADVpacket);
+}
+
+void parseADV() {
   if (newData) {
-    Serial.print("New char on serial: ");
-    Serial.println(recievedChars);
+    if (ADVpacket[1] == VVDChar) {
+      parseVVD();
+    } else {
+      parseVSD();
+    }
     newData = false;
   }
 }
+
 void setup() {
   Serial.begin(9600);
   Serial.println("Teensy ready");
@@ -64,5 +77,5 @@ void setup() {
 
 void loop() {
   recvADV();
-  showNewData();
+  parseADV();
 }
