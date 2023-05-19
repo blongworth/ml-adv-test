@@ -58,23 +58,23 @@ int BCD_Convert(int bit8) {
   return num1;
 }
 
+// why not these for BCD conversion?
+// byte bcdToDec(byte val)
+// {
+//   return( (val/16*10) + (val%16) );
+// }
+// 
+// byte decToBcd(byte val)
+// {
+//   return( (val/10*16) + (val%10) );
+// }
+
 int s16bit(int bit8a, int bit8b) {
   int num2 = bit8a + bit8b * 256;
   if (num2 >= 32768) {
     num2 = num2 - 65536;
   }
   return num2;
-}
-
-void parseVVD() {
-  double VVD[13];
-  Read_VSD(ADVpacket, VSD);
-  Serial.print("New VSD packet: ");
-  Serial.println(ADVpacket);
-  Serial.print("New VSD data: ");
-  Serial.println(VSD);
-  Serial.print("New VVD: ");
-  Serial.println(ADVpacket);
 }
 
 void Read_VSD(char buf[500], double VSD[]) {
@@ -95,12 +95,12 @@ void Read_VSD(char buf[500], double VSD[]) {
 }
 
 void parseVSD() {
-  double VSD[11];
-  Read_VSD(ADVpacket, VSD);
+  //double VSD[11];
+  //Read_VSD(ADVpacket, VSD);
   Serial.print("New VSD packet: ");
   Serial.println(ADVpacket);
-  Serial.print("New VSD data: ");
-  Serial.println(VSD);
+  //Serial.print("New VSD data: ");
+  //Serial.println(VSD);
 }
 
 void Read_VVD(char buf[500], double VVD[]) {//see p37 of Integration Manual for vvd structure
@@ -132,12 +132,12 @@ void Read_VVD(char buf[500], double VVD[]) {//see p37 of Integration Manual for 
 }
 
 void parseVVD() {
-  double VVD[13];
-  Read_VVD(ADVpacket, VVD);
+  //double VVD[13];
+  //Read_VVD(ADVpacket, VVD);
   Serial.print("New VVD packet: ");
   Serial.println(ADVpacket);
-  Serial.print("New VVD data: ");
-  Serial.println(VVD);
+  // Serial.print("New VVD data: ");
+  // Serial.println(VVD);
 }
 
 void parseADV() {
