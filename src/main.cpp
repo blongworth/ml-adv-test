@@ -99,10 +99,10 @@ void parseVSD() {
   }
   Serial.println();
 
-  double VSD[11];
+  double VSD[12];
   Read_VSD(ADVpacket, VSD);
   Serial.print("New VSD data: ");
-  for (int i = 0; i < 11; ++i) {
+  for (int i = 0; i < 12; ++i) {
     Serial.print(VSD[i]);
     Serial.print(",");
   }
@@ -146,10 +146,10 @@ void parseVVD() {
   }
   Serial.println();
 
-  double VVD[13];
+  double VVD[14];
   Read_VVD(ADVpacket, VVD);
   Serial.print("New VVD data: ");
-  for (int i = 0; i < 13; ++i) {
+  for (int i = 0; i < 14; ++i) {
     Serial.print(VVD[i]);
     Serial.print(",");
   }
