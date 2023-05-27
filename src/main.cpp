@@ -1,26 +1,23 @@
 /** Read Nortec Vector ADV serial packets */
 
 #include <Arduino.h>
+#define ADV_SERIAL Serial2
 
 const byte numChars = 28; //max bytes for ADV packets
-const char startMarker = '^'; //start byte of ADV packets
-// const int startMarker = 165; //start byte of ADV packets
-const char VVDChar = 'a'; //VVD packet designator
-const byte VVDLength = 3; //length of VVD packets
-const byte VSDLength = 6; //length of VSD packets
-//const int VVDChar = 16; //VVD packet designator
-//const int VVDLength = 24; //length of VVD packets
-//const int VSDLength = 28; //length of VSD packets
-char ADVpacket[numChars];
+const byte startMarker = 165; //start byte of ADV packets
+const byte VVDChar = 16; //VVD packet designator
+const byte VVDLength = 24; //length of VVD packets
+const byte VSDLength = 28; //length of VSD packets
+byte ADVpacket[numChars];
 boolean newData = false;
 
 void recvADV() {
   static byte ndx = 0;
   static boolean recvInProgress = false;
   static byte packetLength;
-  char rc;
-  while (Serial.available() > 0 && newData == false) {
-    rc = Serial.read();
+  byte rc;
+  while (ADV_SERIAL.available() > 0 && newData == false) {
+    rc = ADV_SERIAL.read();
     if (recvInProgress == true) {
       if (ndx == 1) {
         if (rc == VVDChar) {
@@ -77,7 +74,7 @@ int s16bit(int bit8a, int bit8b) {
   return num2;
 }
 
-void Read_VSD(char buf[500], double VSD[]) {
+void Read_VSD(byte buf[VSDLength], double VSD[]) {
   // min, sec, day, hour, year, month
   VSD[0] = BCD_Convert(buf[4]);
   VSD[1] = BCD_Convert(buf[5]);
@@ -95,15 +92,25 @@ void Read_VSD(char buf[500], double VSD[]) {
 }
 
 void parseVSD() {
-  //double VSD[11];
-  //Read_VSD(ADVpacket, VSD);
   Serial.print("New VSD packet: ");
-  Serial.println(ADVpacket);
-  //Serial.print("New VSD data: ");
-  //Serial.println(VSD);
+  for (int i = 0; i < VSDLength; ++i) {
+    Serial.print(ADVpacket[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+
+  double VSD[11];
+  Read_VSD(ADVpacket, VSD);
+  Serial.print("New VSD data: ");
+  for (int i = 0; i < 11; ++i) {
+    Serial.print(VSD[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+  Serial.println();
 }
 
-void Read_VVD(char buf[500], double VVD[]) {//see p37 of Integration Manual for vvd structure
+void Read_VVD(byte buf[VVDLength], double VVD[]) {//see p37 of Integration Manual for vvd structure
   //code reads until 165, 165 is not included. 165 is designator to start data packet.
   //this is why buf[0] = offset 1 in integration manual
   //buf is the datapacket offset by 1
@@ -132,12 +139,22 @@ void Read_VVD(char buf[500], double VVD[]) {//see p37 of Integration Manual for 
 }
 
 void parseVVD() {
-  //double VVD[13];
-  //Read_VVD(ADVpacket, VVD);
   Serial.print("New VVD packet: ");
-  Serial.println(ADVpacket);
-  // Serial.print("New VVD data: ");
-  // Serial.println(VVD);
+  for (int i = 0; i < VVDLength; ++i) {
+    Serial.print(ADVpacket[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+
+  double VVD[13];
+  Read_VVD(ADVpacket, VVD);
+  Serial.print("New VVD data: ");
+  for (int i = 0; i < 13; ++i) {
+    Serial.print(VVD[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+  Serial.println();
 }
 
 void parseADV() {
@@ -151,9 +168,20 @@ void parseADV() {
   }
 }
 
+void ADVbegin() {
+  ADV_SERIAL.write("@@@@@@");
+  delay(200);
+  ADV_SERIAL.write("K1W%!Q");
+  delay(200);
+  ADV_SERIAL.write("SR");
+}
+
 void setup() {
   Serial.begin(9600);
   Serial.println("Teensy ready");
+  Serial.println("Starting ADV...");
+  ADV_SERIAL.begin(115200);
+  ADVbegin();
 }
 
 void loop() {
