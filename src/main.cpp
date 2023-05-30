@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #define ADV_SERIAL Serial2
+// #define ADV_SERIAL Serial3 // serial 2 for LECS, 3 for GEMS
 
 const byte numChars = 28; //max bytes for ADV packets
 const byte startMarker = 165; //start byte of ADV packets
@@ -178,6 +179,7 @@ void ADVbegin() {
 
 void setup() {
   Serial.begin(9600);
+  delay(3000);
   Serial.println("Teensy ready");
   Serial.println("Starting ADV...");
   ADV_SERIAL.begin(115200);
