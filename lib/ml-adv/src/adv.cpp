@@ -24,6 +24,8 @@ ADV::ADV()
 {
     byte ADVpacket[numChars];
     boolean newData = false;
+    boolean VVDReady = false;
+    boolean VSDReady false;
 }
 
 void ADV::begin() {
@@ -43,13 +45,13 @@ void ADV::read()
   {
     if (ADVpacket[1] == VVDChar)
     {
-      parseVVD();
+      VVDReady = 1;
     }
     else
     {
-      parseVSD();
+      VSDReady = 1;
     }
-    newData = false;
+    //newData = false;
   }
 }
 
@@ -116,43 +118,7 @@ int ADV::s16bit(int bit8a, int bit8b) {
   return num2;
 }
 
-void ADV::Read_VSD(byte buf[VSDLength], double VSD[]) {
-  // min, sec, day, hour, year, month
-  VSD[0] = BCD_Convert(buf[4]);
-  VSD[1] = BCD_Convert(buf[5]);
-  VSD[2] = BCD_Convert(buf[6]);
-  VSD[3] = BCD_Convert(buf[7]);
-  VSD[4] = BCD_Convert(buf[8]);
-  VSD[5] = BCD_Convert(buf[9]);
-  // bat*0.1, soundspeed*0.1, heading*0.1, pitch*0.1, roll*0.1, temp*0.01
-  VSD[6] = s16bit(buf[10], buf[11]);
-  VSD[7] = s16bit(buf[12], buf[13]);
-  VSD[8] = s16bit(buf[14], buf[15]);
-  VSD[9] = s16bit(buf[16], buf[17]);
-  VSD[10] = s16bit(buf[18], buf[19]);
-  VSD[11] = s16bit(buf[20], buf[21]);
-}
-
-void ADV::parseVSD() {
-  Serial.print("New VSD packet: ");
-  for (int i = 0; i < VSDLength; ++i) {
-    Serial.print(ADVpacket[i]);
-    Serial.print(",");
-  }
-  Serial.println();
-
-  double VSD[12];
-  Read_VSD(ADVpacket, VSD);
-  Serial.print("New VSD data: ");
-  for (int i = 0; i < 12; ++i) {
-    Serial.print(VSD[i]);
-    Serial.print(",");
-  }
-  Serial.println();
-  Serial.println();
-}
-
-void ADV::Read_VVD(byte buf[VVDLength], double VVD[]) {//see p37 of Integration Manual for vvd structure
+void ADV::parseVVD(byte buf[VVDLength], double VVD[]) {//see p37 of Integration Manual for vvd structure
   //code reads until 165, 165 is not included. 165 is designator to start data packet.
   //this is why buf[0] = offset 1 in integration manual
   //buf is the datapacket offset by 1
@@ -180,7 +146,24 @@ void ADV::Read_VVD(byte buf[VVDLength], double VVD[]) {//see p37 of Integration 
   VVD[13] = s16bit(buf[8], buf[9]);
 }
 
-void ADV::parseVVD() {
+void ADV::parseVSD(byte buf[VSDLength], double VSD[]) {
+  // min, sec, day, hour, year, month
+  VSD[0] = BCD_Convert(buf[4]);
+  VSD[1] = BCD_Convert(buf[5]);
+  VSD[2] = BCD_Convert(buf[6]);
+  VSD[3] = BCD_Convert(buf[7]);
+  VSD[4] = BCD_Convert(buf[8]);
+  VSD[5] = BCD_Convert(buf[9]);
+  // bat*0.1, soundspeed*0.1, heading*0.1, pitch*0.1, roll*0.1, temp*0.01
+  VSD[6] = s16bit(buf[10], buf[11]);
+  VSD[7] = s16bit(buf[12], buf[13]);
+  VSD[8] = s16bit(buf[14], buf[15]);
+  VSD[9] = s16bit(buf[16], buf[17]);
+  VSD[10] = s16bit(buf[18], buf[19]);
+  VSD[11] = s16bit(buf[20], buf[21]);
+}
+
+void ADV::getVVD() {
   Serial.print("New VVD packet: ");
   for (int i = 0; i < VVDLength; ++i) {
     Serial.print(ADVpacket[i]);
@@ -189,7 +172,7 @@ void ADV::parseVVD() {
   Serial.println();
 
   double VVD[14];
-  Read_VVD(ADVpacket, VVD);
+  parseVVD(ADVpacket, VVD);
   Serial.print("New VVD data: ");
   for (int i = 0; i < 14; ++i) {
     Serial.print(VVD[i]);
@@ -197,4 +180,29 @@ void ADV::parseVVD() {
   }
   Serial.println();
   Serial.println();
+  newData = false;
+  VVDReady = false;
 }
+
+void ADV::getVSD() {
+  Serial.print("New VSD packet: ");
+  for (int i = 0; i < VSDLength; ++i) {
+    Serial.print(ADVpacket[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+
+  double VSD[12];
+  parseVSD(ADVpacket, VSD);
+  Serial.print("New VSD data: ");
+  for (int i = 0; i < 12; ++i) {
+    Serial.print(VSD[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+  Serial.println();
+  newData = false;
+  VSDReady = false;
+}
+
+
