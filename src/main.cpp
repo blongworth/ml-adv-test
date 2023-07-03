@@ -15,12 +15,6 @@ void setup() {
 
 void loop() {
   adv.read();
-
-  if(adv.VVDReady) {
-    adv.getVVD();
-  }
-
-  if(adv.VSDReady) {
-    adv.getVSD();
-  }
+  adv.getVVD();
+  adv.getVSD();
 }

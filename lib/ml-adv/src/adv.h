@@ -40,8 +40,8 @@ public:
     void read();
     boolean VVDReady;
     boolean VSDReady;
-    void getVSD();
-    void getVVD();
+    int getVSD();
+    int getVVD();
 };
 
 #endif

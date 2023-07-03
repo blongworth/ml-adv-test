@@ -22,10 +22,9 @@
 
 ADV::ADV()
 {
-    byte ADVpacket[numChars];
-    boolean newData = false;
-    boolean VVDReady = false;
-    boolean VSDReady false;
+    newData = false;
+    VVDReady = false;
+    VSDReady = false;
 }
 
 void ADV::begin() {
@@ -163,7 +162,8 @@ void ADV::parseVSD(byte buf[VSDLength], double VSD[]) {
   VSD[11] = s16bit(buf[20], buf[21]);
 }
 
-void ADV::getVVD() {
+int ADV::getVVD() {
+  if (!VVDReady) return 0;
   Serial.print("New VVD packet: ");
   for (int i = 0; i < VVDLength; ++i) {
     Serial.print(ADVpacket[i]);
@@ -182,9 +182,11 @@ void ADV::getVVD() {
   Serial.println();
   newData = false;
   VVDReady = false;
+  return 1;
 }
 
-void ADV::getVSD() {
+int ADV::getVSD() {
+  if (!VSDReady) return 0;
   Serial.print("New VSD packet: ");
   for (int i = 0; i < VSDLength; ++i) {
     Serial.print(ADVpacket[i]);
@@ -203,6 +205,7 @@ void ADV::getVSD() {
   Serial.println();
   newData = false;
   VSDReady = false;
+  return 1;
 }
 
 
