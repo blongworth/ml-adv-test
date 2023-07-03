@@ -208,4 +208,29 @@ int ADV::getVSD() {
   return 1;
 }
 
+int ADV::getVVDPacket() {
+  if (!VVDReady) return 0;
+  Serial.print("New VVD packet: ");
+  for (int i = 0; i < VVDLength; ++i) {
+    Serial.print(ADVpacket[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+  newData = false;
+  VVDReady = false;
+  return 1;
+}
+
+int ADV::getVSDPacket() {
+  if (!VSDReady) return 0;
+  Serial.print("New VSD packet: ");
+  for (int i = 0; i < VSDLength; ++i) {
+    Serial.print(ADVpacket[i]);
+    Serial.print(",");
+  }
+  Serial.println();
+  newData = false;
+  VSDReady = false;
+  return 1;
+}
 

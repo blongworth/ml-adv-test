@@ -15,6 +15,6 @@ void setup() {
 
 void loop() {
   adv.read();
-  adv.getVVD();
-  adv.getVSD();
+  adv.getVVDPacket();
+  adv.getVSDPacket();
 }

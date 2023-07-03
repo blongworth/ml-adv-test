@@ -13,7 +13,7 @@
 
 #include <Arduino.h>
 
-#define ADV_SERIAL Serial2
+#define ADV_SERIAL Serial3
 // #define ADV_SERIAL Serial3 // serial 2 for LECS, 3 for GEMS
 
 const byte numChars = 28; //max bytes for ADV packets
@@ -42,6 +42,8 @@ public:
     boolean VSDReady;
     int getVSD();
     int getVVD();
+    int getVSDPacket();
+    int getVVDPacket();
 };
 
 #endif
