@@ -20,7 +20,7 @@
 #include <Arduino.h>
 #include "adv.h"
 
-ADV::ADV()
+ADV::ADV(Stream &serial) : serial(serial)
 {
     newData = false;
     VVDReady = false;
@@ -28,13 +28,11 @@ ADV::ADV()
 }
 
 void ADV::begin() {
-  ADV_SERIAL.begin(115200);
-  delay(1000);
-  ADV_SERIAL.write("@@@@@@");
+  serial.write("@@@@@@");
   delay(200);
-  ADV_SERIAL.write("K1W%!Q");
+  serial.write("K1W%!Q");
   delay(200);
-  ADV_SERIAL.write("SR");
+  serial.write("SR");
 }
 
 void ADV::read()
@@ -59,8 +57,8 @@ void ADV::read_serial() {
   static boolean recvInProgress = false;
   static byte packetLength;
   byte rc;
-  while (ADV_SERIAL.available() > 0 && newData == false) {
-    rc = ADV_SERIAL.read();
+  while (serial.available() > 0 && newData == false) {
+    rc = serial.read();
     if (recvInProgress == true) {
       if (ndx == 1) {
         if (rc == VVDChar) {
@@ -233,4 +231,5 @@ int ADV::getVSDPacket() {
   VSDReady = false;
   return 1;
 }
+
 

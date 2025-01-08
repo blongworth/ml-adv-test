@@ -3,10 +3,11 @@
 #include <Arduino.h>
 #include "adv.h"
 
-ADV adv;
+ADV adv(Serial3);
 
 void setup() {
   Serial.begin(9600);
+  Serial3.begin(115200);
   delay(3000);
   Serial.println("Teensy ready");
   Serial.println("Starting ADV...");

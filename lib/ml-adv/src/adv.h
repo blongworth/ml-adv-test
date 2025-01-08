@@ -13,20 +13,20 @@
 
 #include <Arduino.h>
 
-#define ADV_SERIAL Serial3
-// #define ADV_SERIAL Serial3 // serial 2 for LECS, 3 for GEMS
-
-const byte numChars = 28; //max bytes for ADV packets
-const byte startMarker = 165; //start byte of ADV packets
+// #define ADV_SERIAL Serial3
+// no longer needed. Use appropriate Serial object in constructor
 const byte VVDChar = 16; //VVD packet designator
 const byte VVDLength = 24; //length of VVD packets
 const byte VSDLength = 28; //length of VSD packets
+const byte numChars = 28; //length of ADV packets
+const byte startMarker = 165; //start byte of ADV packets
 
 class ADV
 {
 private:
     byte ADVpacket[numChars];
     boolean newData;
+    Stream &serial;
     
     void read_serial();
     int BCD_Convert(int bit8);
@@ -35,7 +35,7 @@ private:
     void parseVVD(byte buf[VVDLength], double VVD[]); //see p37 of Integration Manual for vvd structure
 
 public:
-    ADV();
+    ADV(Stream &serial);
     void begin();
     void read();
     boolean VVDReady;
