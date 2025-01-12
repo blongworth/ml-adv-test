@@ -1,0 +1,3 @@
+[submodule "lib/ml-adv"]
+	path = lib/ml-adv
+	url = git@github.com:blongworth/ml-adv.git
